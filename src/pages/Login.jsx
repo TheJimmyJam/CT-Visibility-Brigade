@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { expandJimmy } from '../lib/expandJimmy'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -12,7 +13,9 @@ export default function Login() {
     e.preventDefault()
     setError(null)
     setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const signInEmail = expandJimmy(email)
+    if (signInEmail !== email) setEmail(signInEmail)
+    const { error } = await supabase.auth.signInWithPassword({ email: signInEmail, password })
     if (error) setError(error.message)
     setLoading(false)
   }
@@ -30,7 +33,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:16}}>
             <div className="form-group">
               <label className="form-label">Email</label>
-              <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
+              <input className="form-input" type="text" inputMode="email" autoCapitalize="none" spellCheck={false} value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
             </div>
             <div className="form-group">
               <label className="form-label">Password</label>
